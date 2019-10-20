@@ -216,20 +216,29 @@ char   checking=ObstacleFree(x_nearest,x_new,mapData);
 
 	  if (checking==-1){
 
+      p.x=x_new[0];
+      p.y=x_new[1];
+      p.z=0.0;
+
+      bool existFrontier = getCompleteFrontier(p, exploration_goal, mapData);
+      if (!existFrontier) {
+        continue;
+      }
 			exploration_goal.header.stamp=ros::Time(0);
-          	exploration_goal.header.frame_id=mapData.header.frame_id;
-          	exploration_goal.point.x=x_new[0];
-          	exploration_goal.point.y=x_new[1];
-          	exploration_goal.point.z=0.0;
-          	p.x=x_new[0]; 
-			p.y=x_new[1]; 
-			p.z=0.0;
+      exploration_goal.header.frame_id=mapData.header.frame_id;
+
+      //exploration_goal.point.x=x_new[0];
+      //exploration_goal.point.y=x_new[1];
+      exploration_goal.point.z=0.0;
+
+      p.x = exploration_goal.point.x;
+      p.y = exploration_goal.point.y;
 					
-          	points.points.push_back(p);
-          	pub.publish(points) ;
-          	targetspub.publish(exploration_goal);
-		  	points.points.clear();
-		  	V.clear();
+      points.points.push_back(p);
+      pub.publish(points) ;
+      targetspub.publish(exploration_goal);
+      points.points.clear();
+      V.clear();
 		  	
 		  	
 			tf::StampedTransform transform;

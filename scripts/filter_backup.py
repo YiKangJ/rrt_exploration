@@ -15,17 +15,16 @@ from rrt_exploration.msg import PointArray
 
 # Subscribers' callbacks------------------------------
 mapData=OccupancyGrid()
-frontiers={}
+frontiers=[]
 globalmaps=[]
 def callBack(data,args):
 	global frontiers,min_distance
-    transformedPoint=args[0].transformPoint(args[1],data) # transform from local map point to global map
-    x=(transformedPoint.point.x,transformedPoint.point.y)
-    frontiers.add(copy(x))
-    #if len(frontiers)>0:
-    #	frontiers=vstack((frontiers,x))
-    #else:
-    #	frontiers=x
+	transformedPoint=args[0].transformPoint(args[1],data)
+	x=[array([transformedPoint.point.x,transformedPoint.point.y])]
+	if len(frontiers)>0:
+		frontiers=vstack((frontiers,x))
+	else:
+		frontiers=x
     
 
 def mapCallBack(data):
@@ -173,8 +172,7 @@ def node():
 	while not rospy.is_shutdown():
 #-------------------------------------------------------------------------	
 #Clustering frontier points
-        '''
-        centroids=[]
+		centroids=[]
 		front=copy(frontiers)
 		if len(front)>1:
 			ms = MeanShift(bandwidth=0.3)   
@@ -184,49 +182,47 @@ def node():
 		#if there is only one frontier no need for clustering, i.e. centroids=frontiers
 		if len(front)==1:
 			centroids=front
-        frontiers=copy(centroids)
-        '''
-#-------------------------------------------------------------------------
+		frontiers=copy(centroids)
+#-------------------------------------------------------------------------	
 #clearing old frontiers  
       
-        # deleteSet = {}
-        for frontier in list(frontiers):
+		z=0
+		while z<len(centroids):
 			cond=False
-            temppoint.point.x=frontier[0]
-            temppoint.point.y=frontier[1]
+			temppoint.point.x=centroids[z][0]
+			temppoint.point.y=centroids[z][1]
 						
 			for i in range(0,n_robots):
 				
+				
 				transformedPoint=tfLisn.transformPoint(globalmaps[i].header.frame_id,temppoint)
-                x=(transformedPoint.point.x,transformedPoint.point.y)
+				x=array([transformedPoint.point.x,transformedPoint.point.y])
 				cond=(gridValue(globalmaps[i],x)>threshold) or cond
-            if (cond or (informationGain(mapData,[frontier[0],frontier[1]],info_radius*0.5))<0.2):
-                frontiers.remove((frontier[0], frontier[1]))
-
+			if (cond or (informationGain(mapData,[centroids[z][0],centroids[z][1]],info_radius*0.5))<0.2):
+				centroids=delete(centroids, (z), axis=0)
+				z=z-1
+			z+=1
 #-------------------------------------------------------------------------
 #publishing
 		arraypoints.points=[]
-        for i in frontiers:
+		for i in centroids:
 			tempPoint.x=i[0]
 			tempPoint.y=i[1]
 			arraypoints.points.append(copy(tempPoint))
 		filterpub.publish(arraypoints)
-        '''
-        pp=[]
-        for q in range(0,len(frontiers)):
+		pp=[]	
+		for q in range(0,len(frontiers)):
 			p.x=frontiers[q][0]
 			p.y=frontiers[q][1]
 			pp.append(copy(p))
 		points.points=pp
-        '''
 		pp=[]	
-        for q in range(frontiers)):
-            p.x= q[0]
-            p.y= q[1]
+		for q in range(0,len(centroids)):
+			p.x=centroids[q][0]
+			p.y=centroids[q][1]
 			pp.append(copy(p))
-        points_clust.points=pp
-
-        # pub.publish(points)
+		points_clust.points=pp
+		pub.publish(points)
 		pub2.publish(points_clust) 
 		rate.sleep()
 #-------------------------------------------------------------------------
