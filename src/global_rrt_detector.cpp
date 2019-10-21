@@ -66,7 +66,13 @@ int main(int argc, char **argv)
 // generate the same numbers as in the original C test program
   ros::init(argc, argv, "global_rrt_frontier_detector");
   ros::NodeHandle nh;
-  
+
+
+  //debug enabled
+  if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
+    ros::console::notifyLoggerLevelsChanged();
+  }
+
   // fetching all parameters
   float eta,init_map_x,init_map_y,range;
   std::string map_topic,base_frame_topic;
@@ -221,13 +227,14 @@ char   checking=ObstacleFree(x_nearest,x_new,mapData);
             p.y=x_new[1];
             p.z=0.0;
 
+            ROS_DEBUG("before(%f, %f)", p.x, p.y);
             bool existFrontier = getCompleteFrontier(p, exploration_goal, mapData);
             if (!existFrontier) {
               continue;
             }
 
             exploration_goal.header.stamp=ros::Time(0);
-          	exploration_goal.header.frame_id=mapData.header.frame_id;
+            exploration_goal.header.frame_id=mapData.header.frame_id;
             //exploration_goal.point.x=x_new[0];
             //exploration_goal.point.y=x_new[1];
             exploration_goal.point.z=0.0;
@@ -236,12 +243,13 @@ char   checking=ObstacleFree(x_nearest,x_new,mapData);
             p.y = exploration_goal.point.y;
             points.points.push_back(p);
 
+            ROS_DEBUG("after(%f, %f)", p.x, p.y);
 
-          	pub.publish(points) ;
-          	targetspub.publish(exploration_goal);
+            pub.publish(points) ;
+            targetspub.publish(exploration_goal);
             points.points.clear();
-        	
-        	}
+
+          }
 	  	
 	  
 	  else if (checking==1){

@@ -38,7 +38,7 @@ int gridValue(nav_msgs::OccupancyGrid &,std::vector<float>);
 //ObstacleFree function prototype
 char ObstacleFree(std::vector<float> , std::vector<float> & , nav_msgs::OccupancyGrid);
 
-bool getCompleteFrontier(geometry_msgs::Point &, geometry_msgs::PointStamped &, nav_msgs::OccupancyGrid);
+bool getCompleteFrontier(geometry_msgs::Point &, geometry_msgs::PointStamped &, nav_msgs::OccupancyGrid&);
 
 std::vector<unsigned int> nhood8(unsigned int, nav_msgs::OccupancyGrid&);
 

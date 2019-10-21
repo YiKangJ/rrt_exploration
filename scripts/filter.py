@@ -191,7 +191,7 @@ def node():
         #clearing old frontiers  
     
         # deleteSet = {}
-        print frontiers
+        # print frontiers
         for frontier in list(frontiers):
             cond=False
             temppoint.point.x=frontier[0]
@@ -209,11 +209,13 @@ def node():
 #---------------------------------------------------------------------
         #publishing
         arraypoints.points=[]
-        for i in frontiers:
+        
+        for i in list(frontiers):
             tempPoint.x=i[0]
             tempPoint.y=i[1]
             arraypoints.points.append(copy(tempPoint))
         filterpub.publish(arraypoints)
+
         '''
         pp=[]
         for q in range(0,len(frontiers)):
@@ -222,12 +224,13 @@ def node():
                         pp.append(copy(p))
                 points.points=pp
         '''
-        pp=[]	
-        for q in frontiers:
+        '''
+        for q in list(frontiers):
             p.x= q[0]
             p.y= q[1]
             pp.append(copy(p))
-        points_clust.points=pp
+        '''
+        points_clust.points= copy(arraypoints.points)
     
         # pub.publish(points)
         pub2.publish(points_clust) 

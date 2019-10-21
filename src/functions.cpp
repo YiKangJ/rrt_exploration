@@ -126,7 +126,7 @@ char out=0;
 
  }
 
-bool getCompleteFrontier(geometry_msgs::Point& p, geometry_msgs::PointStamped& exploration_goal, nav_msgs::OccupancyGrid mapsub) {
+bool getCompleteFrontier(geometry_msgs::Point& p, geometry_msgs::PointStamped& exploration_goal, nav_msgs::OccupancyGrid& mapsub) {
 
   float Xstartx = mapsub.info.origin.position.x;
   float Xstarty = mapsub.info.origin.position.y;
@@ -171,6 +171,9 @@ bool getCompleteFrontier(geometry_msgs::Point& p, geometry_msgs::PointStamped& e
         centerx += point[0];
         centery += point[1];
         size++;
+
+        //std::cout<<"-----------------------\n" << point[0] << "," << point[1]<< std::endl;
+
       }
     }
 
@@ -255,8 +258,8 @@ bool isNewFrontierCell(unsigned indx, nav_msgs::OccupancyGrid& mapData, const st
 std::vector<float> pointOfIndex(nav_msgs::OccupancyGrid& mapData, unsigned int indx){
   std::vector<float> point;
   unsigned int width = mapData.info.width;
-  unsigned int Xstartx = mapData.info.origin.position.x;
-  unsigned int Xstarty = mapData.info.origin.position.y;
+  float Xstartx = mapData.info.origin.position.x;
+  float Xstarty = mapData.info.origin.position.y;
   float resolution = mapData.info.resolution;
 
   float x = Xstartx + (indx % width)*resolution;
