@@ -15,7 +15,7 @@ from rrt_exploration.msg import PointArray
 
 # Subscribers' callbacks------------------------------
 mapData=OccupancyGrid()
-frontiers={}
+frontiers=set()
 globalmaps=[]
 def callBack(data,args):
     global frontiers,min_distance
@@ -191,6 +191,7 @@ def node():
         #clearing old frontiers  
     
         # deleteSet = {}
+        print frontiers
         for frontier in list(frontiers):
             cond=False
             temppoint.point.x=frontier[0]
@@ -202,7 +203,8 @@ def node():
                 x=(transformedPoint.point.x,transformedPoint.point.y)
                 cond=(gridValue(globalmaps[i],x)>threshold) or cond 
                 if (cond or (informationGain(mapData,[frontier[0],frontier[1]],info_radius*0.5))<0.2):
-                    frontiers.remove((frontier[0], frontier[1]))
+                    if (frontier[0], frontier[1]) in frontiers:
+                        frontiers.remove((frontier[0], frontier[1]))
 
 #---------------------------------------------------------------------
         #publishing
