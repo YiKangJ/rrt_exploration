@@ -247,7 +247,7 @@ char   checking=ObstacleFree(x_nearest,x_new,mapData);
 
             pub.publish(points) ;
             targetspub.publish(exploration_goal);
-            //points.points.clear();
+            points.points.clear();
 
           }
 	  	

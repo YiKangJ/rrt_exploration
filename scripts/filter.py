@@ -202,10 +202,15 @@ def node():
                 transformedPoint=tfLisn.transformPoint(globalmaps[i].header.frame_id,temppoint)
                 x=(transformedPoint.point.x,transformedPoint.point.y)
                 cond=(gridValue(globalmaps[i],x)>threshold) or cond 
+                if (cond or (gridValue(mapData,[frontier[0],frontier[1]]) != -1)):
+                    if (frontier[0], frontier[1]) in frontiers:
+                        frontiers.remove((frontier[0], frontier[1]))
+                     
+                '''
                 if (cond or (informationGain(mapData,[frontier[0],frontier[1]],info_radius*0.5))<0.2):
                     if (frontier[0], frontier[1]) in frontiers:
                         frontiers.remove((frontier[0], frontier[1]))
-
+                '''
 #---------------------------------------------------------------------
         #publishing
         arraypoints.points=[]

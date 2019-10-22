@@ -61,7 +61,6 @@ class robot:
                 else:
                         robot.goal.target_pose.pose.orientation.w = 1.0
                         robot.goal.target_pose.pose.orientation.z = 0.0
-                print robot.goal
 		self.client.send_goal(robot.goal)
 		self.assigned_point=array(point)
 	
