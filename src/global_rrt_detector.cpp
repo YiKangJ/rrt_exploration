@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 
 
   //debug enabled
-  if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
+  if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info)) {
     ros::console::notifyLoggerLevelsChanged();
   }
 
@@ -247,7 +247,7 @@ char   checking=ObstacleFree(x_nearest,x_new,mapData);
 
             pub.publish(points) ;
             targetspub.publish(exploration_goal);
-            points.points.clear();
+            //points.points.clear();
 
           }
 	  	

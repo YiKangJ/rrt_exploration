@@ -4,10 +4,11 @@ from numpy import array
 import actionlib
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from nav_msgs.srv import GetPlan
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, Quaternion
 from numpy import floor
 from numpy.linalg import norm
 from numpy import inf
+from tf.transformations import quaternion_from_euler
 #________________________________________________________________________________
 class robot:
 	goal = MoveBaseGoal()
@@ -50,10 +51,17 @@ class robot:
 		self.position=array([trans[0],trans[1]])
 		return self.position
 		
-	def sendGoal(self,point):
+	def sendGoal(self,point, rotation=False):
 		robot.goal.target_pose.pose.position.x=point[0]
 		robot.goal.target_pose.pose.position.y=point[1]
-		robot.goal.target_pose.pose.orientation.w = 1.0
+                if rotation:
+                        # robot.goal.target_pose.pose.orientation = Quaternion(*quaternion_from_euler(0, 0, 3.1415926))
+                        robot.goal.target_pose.pose.orientation.z = 1.0
+                        robot.goal.target_pose.pose.orientation.w = 0.0
+                else:
+                        robot.goal.target_pose.pose.orientation.w = 1.0
+                        robot.goal.target_pose.pose.orientation.z = 0.0
+                print robot.goal
 		self.client.send_goal(robot.goal)
 		self.assigned_point=array(point)
 	
