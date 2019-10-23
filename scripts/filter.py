@@ -195,16 +195,15 @@ def node():
         print "before clear old frontiers:"
         print frontiers
         for frontier in list(frontiers):
-            cond=False
             temppoint.point.x=frontier[0]
             temppoint.point.y=frontier[1]
     
             for i in range(0,n_robots):
     
                 transformedPoint=tfLisn.transformPoint(globalmaps[i].header.frame_id,temppoint)
-                x=(transformedPoint.point.x,transformedPoint.point.y)
-                cond=(gridValue(globalmaps[i],x)>threshold) or cond 
-                if (cond or isOldFrontier(mapData, [frontier[0], frontier[1]])):
+                #x=(transformedPoint.point.x,transformedPoint.point.y)
+                #cond=(gridValue(globalmaps[i],x)>threshold) or cond 
+                if (informationGain(mapData, [frontier[0], frontier[1]],info_radius*0.5) < 0.02):
                     if (frontier[0], frontier[1]) in frontiers:
                         frontiers.remove((frontier[0], frontier[1]))
                      
@@ -216,7 +215,6 @@ def node():
 
         print "after clear frontiers:"
         print frontiers
-        print "cond:" + str(cond)
 #---------------------------------------------------------------------
         #publishing
         arraypoints.points=[]
