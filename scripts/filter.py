@@ -9,7 +9,7 @@ from nav_msgs.msg import OccupancyGrid
 from geometry_msgs.msg import PointStamped 
 import tf
 from numpy import array,vstack,delete
-from functions import gridValue,informationGain
+from functions import gridValue,informationGain,isOldFrontier
 from sklearn.cluster import MeanShift
 from rrt_exploration.msg import PointArray
 
@@ -56,7 +56,7 @@ def node():
     n_robots = rospy.get_param('~n_robots',1)
     namespace = rospy.get_param('~namespace','')
     namespace_init_count = rospy.get_param('namespace_init_count',1)
-    rateHz = rospy.get_param('~rate',100)
+    rateHz = rospy.get_param('~rate',1)
     litraIndx=len(namespace)
     rate = rospy.Rate(rateHz)
 #---------------------------------------
@@ -192,6 +192,8 @@ def node():
     
         # deleteSet = {}
         # print frontiers
+        print "before clear old frontiers:"
+        print frontiers
         for frontier in list(frontiers):
             cond=False
             temppoint.point.x=frontier[0]
@@ -202,7 +204,7 @@ def node():
                 transformedPoint=tfLisn.transformPoint(globalmaps[i].header.frame_id,temppoint)
                 x=(transformedPoint.point.x,transformedPoint.point.y)
                 cond=(gridValue(globalmaps[i],x)>threshold) or cond 
-                if (cond or (gridValue(mapData,[frontier[0],frontier[1]]) != -1)):
+                if (cond or isOldFrontier(mapData, [frontier[0], frontier[1]])):
                     if (frontier[0], frontier[1]) in frontiers:
                         frontiers.remove((frontier[0], frontier[1]))
                      
@@ -211,6 +213,10 @@ def node():
                     if (frontier[0], frontier[1]) in frontiers:
                         frontiers.remove((frontier[0], frontier[1]))
                 '''
+
+        print "after clear frontiers:"
+        print frontiers
+        print "cond:" + str(cond)
 #---------------------------------------------------------------------
         #publishing
         arraypoints.points=[]

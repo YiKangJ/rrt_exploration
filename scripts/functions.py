@@ -175,6 +175,60 @@ def Nearest2(V,x):
 		n=n1
  return i
 #________________________________________________________________________________
+def isOldFrontier(mapData, Xp): #OldFrontier now isnot frontier
+    resolution=mapData.info.resolution
+    Xstartx=mapData.info.origin.position.x
+    Xstarty=mapData.info.origin.position.y
+
+    width=mapData.info.width
+    height=mapData.info.height
+    data=mapData.data
+    # returns if the cell is an old frontier at "Xp" location
+    #map data:  100 occupied      -1 unknown       0 free
+    index=(int)(floor((Xp[1]-Xstarty)/resolution)*width + floor((Xp[0]-Xstartx)/resolution) )
+    if data[index] != -1:
+        return True
+    # all region belong to uknown isunvalid frontier
+    for nbr in nhood8(index, width, height):
+        if (data[nbr] == 0):
+            return False
+    print "unvalid frontier"
+    return True
+
+def nhood8(index, width, height):
+    # returns if the cell is an old frontier at "Xp" location
+    #map data:  100 occupied      -1 unknown       0 free
+    out = []
+    if (index > width*height-1):
+        rospy.logwarn("Evaluating nhood for offmap point")
+        return out
+    
+    if (index % width > 0):
+        out.append(index-1)
+    
+    if (index % width < (width-1)):
+        out.append(index+1)
+
+    if (index >= width):
+        out.append(index-width)
+
+    if (index < width*(height-1)):
+        out.append(index+width)
+
+    if (index % width > 0 and index >= width):
+        out.append(index-1-width)
+
+    if (index % width > 0 and index < width*(height-1)):
+        out.append(index-1+width)
+
+    if (index % width < (width-1) and index >= width):
+        out.append(index+1-width)
+
+    if (index % width < (width-1) and index < width*(height-1)):
+        out.append(index+1+width)
+
+    return out
+
 def gridValue(mapData,Xp):
  resolution=mapData.info.resolution
  Xstartx=mapData.info.origin.position.x
@@ -190,39 +244,3 @@ def gridValue(mapData,Xp):
  	return Data[int(index)]
  else:
  	return 100
-
- 
-
-		
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
