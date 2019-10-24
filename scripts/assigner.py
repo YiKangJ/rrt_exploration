@@ -15,6 +15,7 @@ from numpy import all as All
 from numpy import inf
 from functions import robot,informationGain,discount
 from numpy.linalg import norm
+import time
 
 # Subscribers' callbacks------------------------------
 mapData=OccupancyGrid()
@@ -36,6 +37,7 @@ def mapCallBack(data):
 # Node----------------------------------------------
 
 def node():
+
 	global frontiers,mapData,global1,global2,global3,globalmaps
 	rospy.init_node('assigner', anonymous=False)
 	
@@ -76,6 +78,7 @@ def node():
 		robots[i].sendGoal(robots[i].getPosition())
 
         
+        start = time.time()
 #-------------------------------------------------------------------------
 #--------------------      Initial Rotation     --------------------------
 
@@ -169,7 +172,10 @@ def node():
                         break
 #------------------------------------------------------------------------- 
 		rate.sleep()
+        end = time.time()
+        rospy.loginfo("total time: " + str(end-start))
 #-------------------------------------------------------------------------
+
 
 if __name__ == '__main__':
     try:
