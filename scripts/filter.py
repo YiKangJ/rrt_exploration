@@ -53,7 +53,7 @@ def node():
 	n_robots = rospy.get_param('~n_robots',1)
 	namespace = rospy.get_param('~namespace','')
 	namespace_init_count = rospy.get_param('namespace_init_count',1)
-	rateHz = rospy.get_param('~rate',100)
+	rateHz = rospy.get_param('~rate',1)
 	litraIndx=len(namespace)
 	rate = rospy.Rate(rateHz)
 #-------------------------------------------

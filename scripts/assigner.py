@@ -52,7 +52,7 @@ def node():
 	namespace = rospy.get_param('~namespace','')
 	namespace_init_count = rospy.get_param('namespace_init_count',1)
 	delay_after_assignement=rospy.get_param('~delay_after_assignement',0.5)
-	rateHz = rospy.get_param('~rate',100)
+	rateHz = rospy.get_param('~rate',1)
 	
 	rate = rospy.Rate(rateHz)
 #-------------------------------------------
