@@ -15,6 +15,7 @@ from numpy import all as All
 from numpy import inf
 from functions import robot,informationGain,discount
 from numpy.linalg import norm
+import time
 
 # Subscribers' callbacks------------------------------
 mapData=OccupancyGrid()
@@ -35,6 +36,8 @@ def mapCallBack(data):
 # Node----------------------------------------------
 
 def node():
+
+        stop = 0
 	global frontiers,mapData,global1,global2,global3,globalmaps
 	rospy.init_node('assigner', anonymous=False)
 	
@@ -73,6 +76,8 @@ def node():
 			robots.append(robot(namespace))
 	for i in range(0,n_robots):
 		robots[i].sendGoal(robots[i].getPosition())
+
+        start = time.time()
 #-------------------------------------------------------------------------
 #---------------------     Main   Loop     -------------------------------
 #-------------------------------------------------------------------------
@@ -141,12 +146,23 @@ def node():
 		
 #-------------------------------------------------------------------------	
 		if (len(id_record)>0):
+                        stop = 0
 			winner_id=revenue_record.index(max(revenue_record))
 			robots[id_record[winner_id]].sendGoal(centroid_record[winner_id])
 			rospy.loginfo(namespace+str(namespace_init_count+id_record[winner_id])+"  assigned to  "+str(centroid_record[winner_id]))	
 			rospy.sleep(delay_after_assignement)
+                else:
+                        stop += 1
+                        if (stop == rateHz*5):
+                            for i in range(0, n_robots):
+                                robots[i].cancelGoal()
+                            rospy.loginfo("Exploration has been finished.")
+                            break
 #------------------------------------------------------------------------- 
 		rate.sleep()
+
+        end =  time.time()
+        rospy.loginfo("total time: " + str(end-start))
 #-------------------------------------------------------------------------
 
 if __name__ == '__main__':
