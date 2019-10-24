@@ -23,6 +23,7 @@ global1=OccupancyGrid()
 global2=OccupancyGrid()
 global3=OccupancyGrid()
 globalmaps=[]
+stop = 0
 def callBack(data):
 	global frontiers
 	frontiers=[]
@@ -49,7 +50,7 @@ def node():
 	namespace = rospy.get_param('~namespace','')
 	namespace_init_count = rospy.get_param('namespace_init_count',1)
 	delay_after_assignement=rospy.get_param('~delay_after_assignement',0.5)
-	rateHz = rospy.get_param('~rate',100)
+	rateHz = rospy.get_param('~rate',2)
 	
 	rate = rospy.Rate(rateHz)
 #-------------------------------------------
@@ -80,8 +81,8 @@ def node():
 
 	for i in range(0,n_robots):
 		robots[i].sendGoal(robots[i].getPosition(), rotation=True)
-        rospy.loginfo("initial finished.")
         rospy.sleep(3);
+        rospy.loginfo("initial finished.")
 
 
 #-------------------------------------------------------------------------
@@ -152,10 +153,20 @@ def node():
 		
 #-------------------------------------------------------------------------	
 		if (len(id_record)>0):
+                        stop = 0
 			winner_id=revenue_record.index(max(revenue_record))
 			robots[id_record[winner_id]].sendGoal(centroid_record[winner_id])
 			rospy.loginfo(namespace+str(namespace_init_count+id_record[winner_id])+"  assigned to  "+str(centroid_record[winner_id]))	
 			rospy.sleep(delay_after_assignement)
+                else:
+                    stop += 1
+
+                    if (stop == rateHz*5):
+                        for i in range(0, n_robots):
+                            robots[i].cancelGoal()
+
+                        rospy.loginfo("Exploration has been finished.")
+                        break
 #------------------------------------------------------------------------- 
 		rate.sleep()
 #-------------------------------------------------------------------------
