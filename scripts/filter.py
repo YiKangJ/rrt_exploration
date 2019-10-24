@@ -190,22 +190,18 @@ def node():
 #---------------------------------------------------------------------
         #clearing old frontiers  
     
-        # deleteSet = {}
-        # print frontiers
-        print "before clear old frontiers:"
-        print frontiers
         for frontier in list(frontiers):
-            temppoint.point.x=frontier[0]
-            temppoint.point.y=frontier[1]
+            # temppoint.point.x=frontier[0]
+            # temppoint.point.y=frontier[1]
     
-            for i in range(0,n_robots):
+            # for i in range(0,n_robots):
     
-                transformedPoint=tfLisn.transformPoint(globalmaps[i].header.frame_id,temppoint)
+                # transformedPoint=tfLisn.transformPoint(globalmaps[i].header.frame_id,temppoint)
                 #x=(transformedPoint.point.x,transformedPoint.point.y)
                 #cond=(gridValue(globalmaps[i],x)>threshold) or cond 
-                if (informationGain(mapData, [frontier[0], frontier[1]],info_radius*0.5) < 0.02):
-                    if (frontier[0], frontier[1]) in frontiers:
-                        frontiers.remove((frontier[0], frontier[1]))
+            if (informationGain(mapData, [frontier[0], frontier[1]],info_radius*0.5) < 0.2):
+                if (frontier[0], frontier[1]) in frontiers:
+                    frontiers.remove((frontier[0], frontier[1]))
                      
                 '''
                 if (cond or (informationGain(mapData,[frontier[0],frontier[1]],info_radius*0.5))<0.2):
@@ -213,8 +209,6 @@ def node():
                         frontiers.remove((frontier[0], frontier[1]))
                 '''
 
-        print "after clear frontiers:"
-        print frontiers
 #---------------------------------------------------------------------
         #publishing
         arraypoints.points=[]

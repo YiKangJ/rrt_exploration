@@ -80,8 +80,8 @@ def node():
 
 	for i in range(0,n_robots):
 		robots[i].sendGoal(robots[i].getPosition(), rotation=True)
-        rospy.sleep(5);
         rospy.loginfo("initial finished.")
+        rospy.sleep(3);
 
 
 #-------------------------------------------------------------------------
