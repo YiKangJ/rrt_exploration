@@ -24,7 +24,6 @@ global1=OccupancyGrid()
 global2=OccupancyGrid()
 global3=OccupancyGrid()
 globalmaps=[]
-stop = 0
 def callBack(data):
 	global frontiers
 	frontiers=[]
@@ -37,6 +36,8 @@ def mapCallBack(data):
 # Node----------------------------------------------
 
 def node():
+        
+        stop = 0
 
 	global frontiers,mapData,global1,global2,global3,globalmaps
 	rospy.init_node('assigner', anonymous=False)
