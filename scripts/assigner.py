@@ -47,8 +47,10 @@ def node():
 	info_radius= rospy.get_param('~info_radius',1.0)					#this can be smaller than the laser scanner range, >> smaller >>less computation time>> too small is not good, info gain won't be accurate
 	info_multiplier=rospy.get_param('~info_multiplier',3.0)		
 	hysteresis_radius=rospy.get_param('~hysteresis_radius',3.0)			#at least as much as the laser scanner range
-	hysteresis_gain=rospy.get_param('~hysteresis_gain',2.0)				#bigger than 1 (biase robot to continue exploring current region
+	hysteresis_gain=rospy.get_param('~hysteresis_gain',5.0)				#bigger than 1 (biase robot to continue exploring current region
 	frontiers_topic= rospy.get_param('~frontiers_topic','/filtered_points')	
+	# the balance between infomationGain and path cost
+        infofactor= rospy.get_param('~infofactor',0.5)	
 	n_robots = rospy.get_param('~n_robots',1)
 	namespace = rospy.get_param('~namespace','')
 	namespace_init_count = rospy.get_param('namespace_init_count',1)
@@ -120,10 +122,12 @@ def node():
 		
 		for ir in na:
 			for ip in range(0,len(centroids)):
-				cost=norm(robots[ir].getPosition()-centroids[ip])		
+				# cost=norm(robots[ir].getPosition()-centroids[ip])		
+				cost=robots[ir].getPathDistance(robots[ir].getPosition(), centroids[ip])	
+                                print "cost: " + str(robots[ir].getPosition()) + "----" + str(centroids[ip]) + "  " +str(cost)
 				threshold=1
 				information_gain=infoGain[ip]
-				if (norm(robots[ir].getPosition()-centroids[ip])<=hysteresis_radius):
+				if (cost<=hysteresis_radius):
 
 					information_gain*=hysteresis_gain
 				revenue=information_gain*info_multiplier-cost
@@ -137,13 +141,18 @@ def node():
 			id_record=[]
 			for ir in nb:
 				for ip in range(0,len(centroids)):
-					cost=norm(robots[ir].getPosition()-centroids[ip])		
+					# cost=norm(robots[ir].getPosition()-centroids[ip])		
+				        cost=robots[ir].getPathDistance(robots[ir].getPosition(), centroids[ip])		
+                                        print "cost: " + str(robots[ir].getPosition()) + "----" + str(centroids[ip]) + "  " +str(cost)
 					threshold=1
 					information_gain=infoGain[ip]
-					if (norm(robots[ir].getPosition()-centroids[ip])<=hysteresis_radius):
+					if (cost<=hysteresis_radius):
+					# if (norm(robots[ir].getPosition()-centroids[ip])<=hysteresis_radius):
 						information_gain*=hysteresis_gain
 				
-					if ((norm(centroids[ip]-robots[ir].assigned_point))<hysteresis_radius):
+                                        if (norm(robots[ir].assigned_point-centroids[ip])< 0.1): # 0.1 a samll value means that the assigned_point is the same as the centroids[ip]
+					# if (robots[ir].getPathDistance(robots[ir].assigned_point, centroids[ip])<hysteresis_radius):
+					# if ((norm(centroids[ip]-robots[ir].assigned_point))<hysteresis_radius):
 						information_gain=informationGain(mapData,[centroids[ip][0],centroids[ip][1]],info_radius)*hysteresis_gain
 
 					revenue=information_gain*info_multiplier-cost
@@ -182,8 +191,7 @@ if __name__ == '__main__':
     try:
         node()
     except rospy.ROSInterruptException:
-        pass
- 
+        pass 
  
  
  

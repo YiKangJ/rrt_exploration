@@ -9,6 +9,7 @@ from numpy import floor
 from numpy.linalg import norm
 from numpy import inf
 from tf.transformations import quaternion_from_euler
+from math import sqrt
 #________________________________________________________________________________
 class robot:
 	goal = MoveBaseGoal()
@@ -80,7 +81,21 @@ class robot:
 		end=self.listener.transformPose(self.name+'/map', robot.end)
 		plan=self.make_plan(start = start, goal = end, tolerance = 0.0)
 		return plan.plan.poses	
+
+        def getPathDistance(self, start, end):
+                poses = self.makePlan(start, end)
+                if (len(poses) == 0):
+                    return 1e10
+                distance = 0
+                for i in range(len(poses)-1):
+                    distance += eulerDistance(poses[i].pose.position, poses[i+1].pose.position)
+
+                return distance
+
+
 #________________________________________________________________________________
+def eulerDistance(start, end):
+    return sqrt((start.x-end.x)**2 + (start.y-end.y)**2)
 
 def index_of_point(mapData,Xp):
 	resolution=mapData.info.resolution
@@ -117,6 +132,7 @@ def discount(mapData,assigned_pt,centroids,infoGain,r):
 	index=index_of_point(mapData,assigned_pt)
 	r_region=int(r/mapData.info.resolution)
 	init_index=index-r_region*(mapData.info.width+1)
+        factor = mapData.info.resolution**2
 	for n in range(0,2*r_region+1):
 		start=n*mapData.info.width+init_index
 		end=start+2*r_region
@@ -126,7 +142,7 @@ def discount(mapData,assigned_pt,centroids,infoGain,r):
 				for j in range(0,len(centroids)):
 					current_pt=centroids[j]
 					if(mapData.data[i]==-1 and norm(point_of_index(mapData,i)-current_pt)<=r and norm(point_of_index(mapData,i)-assigned_pt)<=r):
-						infoGain[j]-=1 #this should be modified, subtract the area of a cell, not 1
+						infoGain[j]-=1*factor #this should be modified, subtract the area of a cell, not 1
 	return infoGain
 #________________________________________________________________________________
 
