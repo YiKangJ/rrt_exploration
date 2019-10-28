@@ -143,7 +143,11 @@ def discount(mapData,assigned_pt,centroids,infoGain,r):
 					current_pt=centroids[j]
 					if(mapData.data[i]==-1 and norm(point_of_index(mapData,i)-current_pt)<=r and norm(point_of_index(mapData,i)-assigned_pt)<=r):
 						infoGain[j]-=1*factor #this should be modified, subtract the area of a cell, not 1
-	return infoGain
+        if infoGain < 0:
+            rospy.logwarn("Multi robots discount the same centriod let the infoGain to be negative.")
+            return 0
+        else:
+	    return infoGain
 #________________________________________________________________________________
 
 def pathCost(path):

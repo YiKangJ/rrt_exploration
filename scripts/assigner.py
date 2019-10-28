@@ -45,17 +45,16 @@ def node():
 	# fetching all parameters
 	map_topic= rospy.get_param('~map_topic','/map')
 	info_radius= rospy.get_param('~info_radius',1.0)					#this can be smaller than the laser scanner range, >> smaller >>less computation time>> too small is not good, info gain won't be accurate
-	info_multiplier=rospy.get_param('~info_multiplier',3.0)		
+	info_multiplier=rospy.get_param('~info_multiplier',500.0)		
 	hysteresis_radius=rospy.get_param('~hysteresis_radius',3.0)			#at least as much as the laser scanner range
 	hysteresis_gain=rospy.get_param('~hysteresis_gain',5.0)				#bigger than 1 (biase robot to continue exploring current region
 	frontiers_topic= rospy.get_param('~frontiers_topic','/filtered_points')	
 	# the balance between infomationGain and path cost
-        infofactor= rospy.get_param('~infofactor',0.5)	
 	n_robots = rospy.get_param('~n_robots',1)
 	namespace = rospy.get_param('~namespace','')
 	namespace_init_count = rospy.get_param('namespace_init_count',1)
 	delay_after_assignement=rospy.get_param('~delay_after_assignement',0.5)
-	rateHz = rospy.get_param('~rate',2)
+	rateHz = rospy.get_param('~rate',1)
 	
 	rate = rospy.Rate(rateHz)
 #-------------------------------------------
@@ -113,7 +112,8 @@ def node():
 		rospy.loginfo("available robots: "+str(na))	
 #------------------------------------------------------------------------- 
 #get dicount and update informationGain
-		for i in nb+na:
+		for i in nb:
+		# for i in nb+na:
 			infoGain=discount(mapData,robots[i].assigned_point,centroids,infoGain,info_radius)
 #-------------------------------------------------------------------------            
 		revenue_record=[]
