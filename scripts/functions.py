@@ -85,7 +85,7 @@ class robot:
         def getPathDistance(self, start, end):
                 poses = self.makePlan(start, end)
                 if (len(poses) == 0):
-                    return 1e10
+                    return 100
                 distance = 0
                 for i in range(len(poses)-1):
                     distance += eulerDistance(poses[i].pose.position, poses[i+1].pose.position)
@@ -143,11 +143,9 @@ def discount(mapData,assigned_pt,centroids,infoGain,r):
 					current_pt=centroids[j]
 					if(mapData.data[i]==-1 and norm(point_of_index(mapData,i)-current_pt)<=r and norm(point_of_index(mapData,i)-assigned_pt)<=r):
 						infoGain[j]-=1*factor #this should be modified, subtract the area of a cell, not 1
-        if infoGain < 0:
-            rospy.logwarn("Multi robots discount the same centriod let the infoGain to be negative.")
-            return 0
-        else:
-	    return infoGain
+                                                if infoGain[j] < 0:
+                                                    infoGain[j] = 0
+	return infoGain
 #________________________________________________________________________________
 
 def pathCost(path):

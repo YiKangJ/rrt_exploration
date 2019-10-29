@@ -13,7 +13,7 @@ from numpy import array
 from numpy import linalg as LA
 from numpy import all as All
 from numpy import inf
-from functions import robot,informationGain,discount
+from functions import robot,informationGain,discount,gridValue
 from numpy.linalg import norm
 import time
 
@@ -45,7 +45,7 @@ def node():
 	# fetching all parameters
 	map_topic= rospy.get_param('~map_topic','/map')
 	info_radius= rospy.get_param('~info_radius',1.0)					#this can be smaller than the laser scanner range, >> smaller >>less computation time>> too small is not good, info gain won't be accurate
-	info_multiplier=rospy.get_param('~info_multiplier',500.0)		
+	info_multiplier=rospy.get_param('~info_multiplier',3.0)		
 	hysteresis_radius=rospy.get_param('~hysteresis_radius',3.0)			#at least as much as the laser scanner range
 	hysteresis_gain=rospy.get_param('~hysteresis_gain',5.0)				#bigger than 1 (biase robot to continue exploring current region
 	frontiers_topic= rospy.get_param('~frontiers_topic','/filtered_points')	
@@ -94,6 +94,16 @@ def node():
 #---------------------     Main   Loop     -------------------------------
 #-------------------------------------------------------------------------
 	while not rospy.is_shutdown():
+
+#-------------------------- Cancel Goal ----------------------------------
+                '''
+                for i in range(0, n_robots):
+                        value = gridValue(mapData, robots[i].assigned_point)
+                        if (value != -1):
+                            robots[i].cancelGoal()
+                            rospy.sleep(0.5)
+                '''
+#-------------------------------------------------------------------------
 		centroids=copy(frontiers)		
 #-------------------------------------------------------------------------			
 #Get information gain for each frontier point
@@ -111,9 +121,11 @@ def node():
 				na.append(i)	
 		rospy.loginfo("available robots: "+str(na))	
 #------------------------------------------------------------------------- 
+
 #get dicount and update informationGain
-		for i in nb:
-		# for i in nb+na:
+		# for i in nb:
+		for i in nb+na:
+
 			infoGain=discount(mapData,robots[i].assigned_point,centroids,infoGain,info_radius)
 #-------------------------------------------------------------------------            
 		revenue_record=[]
@@ -130,6 +142,7 @@ def node():
 				if (cost<=hysteresis_radius):
 
 					information_gain*=hysteresis_gain
+                                print "informationGain:" + str(information_gain)
 				revenue=information_gain*info_multiplier-cost
 				revenue_record.append(revenue)
 				centroid_record.append(centroids[ip])
@@ -155,6 +168,7 @@ def node():
 					# if ((norm(centroids[ip]-robots[ir].assigned_point))<hysteresis_radius):
 						information_gain=informationGain(mapData,[centroids[ip][0],centroids[ip][1]],info_radius)*hysteresis_gain
 
+                                        print "informationGain:" + str(information_gain)
 					revenue=information_gain*info_multiplier-cost
 					revenue_record.append(revenue)
 					centroid_record.append(centroids[ip])
