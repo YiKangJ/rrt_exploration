@@ -9,7 +9,7 @@ from nav_msgs.msg import OccupancyGrid
 from geometry_msgs.msg import PointStamped 
 import tf
 from numpy import array,vstack,delete
-from functions import gridValue,informationGain
+from functions import gridValue,informationGain,isValidPoint
 from sklearn.cluster import MeanShift
 from rrt_exploration.msg import PointArray
 
@@ -182,7 +182,7 @@ def node():
 		#if there is only one frontier no need for clustering, i.e. centroids=frontiers
 		if len(front)==1:
 			centroids=front
-		frontiers=copy(centroids)
+		frontier=copy(centroids)
 #-------------------------------------------------------------------------	
 #clearing old frontiers  
       
@@ -198,6 +198,7 @@ def node():
 				transformedPoint=tfLisn.transformPoint(globalmaps[i].header.frame_id,temppoint)
 				x=array([transformedPoint.point.x,transformedPoint.point.y])
 				cond=(gridValue(globalmaps[i],x)>threshold) or cond
+                                # cond=(isValidPoint(mapData,[centroids[z][0], centroids[z][1]])) or cond
 			if (cond or (informationGain(mapData,[centroids[z][0],centroids[z][1]],info_radius*0.5))<0.2):
 				centroids=delete(centroids, (z), axis=0)
 				z=z-1
@@ -211,9 +212,9 @@ def node():
 			arraypoints.points.append(copy(tempPoint))
 		filterpub.publish(arraypoints)
 		pp=[]	
-		for q in range(0,len(frontiers)):
-			p.x=frontiers[q][0]
-			p.y=frontiers[q][1]
+		for q in range(0,len(frontier)):
+			p.x=frontier[q][0]
+			p.y=frontier[q][1]
 			pp.append(copy(p))
 		points.points=pp
 

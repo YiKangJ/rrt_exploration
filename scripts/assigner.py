@@ -165,16 +165,22 @@ def node():
                 else:
                     stop += 1
 
-                    if (stop == rateHz*5):
-                        for i in range(0, n_robots):
-                            robots[i].cancelGoal()
+                    print "stop:  " + str(stop)
+                    if (stop >= rateHz*5):
+                        #for i in range(0, n_robots):
+                        #    robots[i].cancelGoal()
 
                         rospy.loginfo("Exploration has been finished.")
-                        break
+                        # break
+
+                        end = time.time()
+                        rospy.loginfo("total time: " + str(end-start))
+                        with open('/home/jyk/multirobot_ws/src/rrt_exploration/scripts/res.txt','a+') as f:
+                            f.write("total time: " + str(end-start)+ '\n')
+                        stop = 0
 #------------------------------------------------------------------------- 
 		rate.sleep()
-        end = time.time()
-        rospy.loginfo("total time: " + str(end-start))
+
 #-------------------------------------------------------------------------
 
 

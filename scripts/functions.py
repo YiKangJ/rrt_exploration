@@ -195,6 +195,24 @@ def isOldFrontier(mapData, Xp): #OldFrontier now isnot frontier
     print "unvalid frontier"
     return True
 
+# A point which has 8 unknown adjacent cells 
+def isValidPoint(mapData, Xp):
+    resolution=mapData.info.resolution
+    Xstartx=mapData.info.origin.position.x
+    Xstarty=mapData.info.origin.position.y
+    width=mapData.info.width
+    height=mapData.info.height
+    data=mapData.data
+    index=(int)(floor((Xp[1]-Xstarty)/resolution)*width + floor((Xp[0]-Xstartx)/resolution) )
+    if data[index] != -1:
+        return False
+    # all region belong to uknown isunvalid frontier
+    for nbr in nhood8(index, width, height):
+        if (data[nbr] != -1):
+            return False
+
+    return True 
+
 def nhood8(index, width, height):
     # returns if the cell is an old frontier at "Xp" location
     #map data:  100 occupied      -1 unknown       0 free
