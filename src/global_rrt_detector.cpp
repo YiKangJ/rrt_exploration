@@ -230,7 +230,9 @@ char   checking=ObstacleFree(x_nearest,x_new,mapData);
             ROS_DEBUG("before(%f, %f)", p.x, p.y);
             bool existFrontier = getCompleteFrontier(p, exploration_goal, mapData);
             if (!existFrontier) {
-              continue;
+                exploration_goal.point.x = p.x;
+                exploration_goal.point.y = p.y;
+
             }
 
             exploration_goal.header.stamp=ros::Time(0);

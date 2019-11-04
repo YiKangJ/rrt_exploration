@@ -139,9 +139,10 @@ bool getCompleteFrontier(geometry_msgs::Point& p, geometry_msgs::PointStamped& e
   //std::vector<unsigned int> out = nhood8(indx, mapsub);
 
   // center of the frontier
-  float centerx = 0;
-  float centery = 0;
+  float centerx = p.x;
+  float centery = p.y;
   unsigned int size = 1;
+
 
 
   std::vector<signed char> data = mapsub.data;
@@ -151,12 +152,20 @@ bool getCompleteFrontier(geometry_msgs::Point& p, geometry_msgs::PointStamped& e
     return false;
   }
 
+  std::vector<std::vector<float> > frontierPoints; // store the complete frontier
+
   std::queue<unsigned int> queue;
   std::vector<bool> visited(width*height, false);
 
   // push the initial cell
   queue.push(indx);
   visited[indx] = true;
+
+  std::vector<float> fpoint;
+  fpoint.push_back(p.x);
+  fpoint.push_back(p.y);
+
+  frontierPoints.push_back(fpoint);
 
   while (!queue.empty()) {
     unsigned int idx = queue.front();
@@ -172,6 +181,11 @@ bool getCompleteFrontier(geometry_msgs::Point& p, geometry_msgs::PointStamped& e
         centery += point[1];
         size++;
 
+        std::vector<float> fpoint;
+        fpoint.push_back(p.x);
+        fpoint.push_back(p.y);
+        frontierPoints.push_back(fpoint);
+
         //std::cout<<"-----------------------\n" << point[0] << "," << point[1]<< std::endl;
 
       }
@@ -180,8 +194,23 @@ bool getCompleteFrontier(geometry_msgs::Point& p, geometry_msgs::PointStamped& e
 
   }
 
-  exploration_goal.point.x = centerx/size;
-  exploration_goal.point.y = centery/size;
+  std::vector<float> centerPoint;
+  centerPoint.push_back(centerx/size);
+  centerPoint.push_back(centery/size);
+
+  exploration_goal.point.x = p.x;
+  exploration_goal.point.y = p.y;
+
+  float distance = 1e10;
+
+  for (int i=0; i<size; i++){
+    float curr_dis = Norm(frontierPoints[i], centerPoint);
+    if (curr_dis<distance) {
+      distance = curr_dis;
+      exploration_goal.point.x = frontierPoints[i][0];
+      exploration_goal.point.y = frontierPoints[i][1];
+    }
+  }
 
   return true;
 }
